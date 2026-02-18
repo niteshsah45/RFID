@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RFID Attendance Dashboard</title>
+  <link rel="stylesheet" href="rfid.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>RFID Attendance Dashboard</h1>
+      <p class="subtitle">Teacher attendance monitor (Firebase Realtime Database)</p>
+    </header>
+
+    <!-- Login card shown when user is not authenticated -->
+    <section id="login-card" class="card">
+      <h2>Teacher Login</h2>
+      <form id="login-form" class="form-grid">
+        <label>
+          Email
+          <input type="email" id="email" placeholder="Enter your Email" required />
+        </label>
+        <label>
+          Password
+          <input type="password" id="password" placeholder="Enter password" required />
+        </label>
+        <button type="submit">Login</button>
+      </form>
+      <p id="login-message" class="message"></p>
+    </section>
+
+    <!-- Dashboard shown after successful authentication -->
+    <section id="dashboard" class="hidden">
+      <div class="toolbar card">
+        <div class="toolbar-item">
+          <span class="label">Signed in as</span>
+          <strong id="teacher-email">-</strong>
+        </div>
+        <div class="toolbar-item">
+          <label for="subject-select" class="label">Subject</label>
+          <select id="subject-select"></select>
+        </div>
+        <div class="toolbar-item">
+          <span class="label">Active date</span>
+          <strong id="active-date">-</strong>
+        </div>
+        <button id="logout-btn" class="secondary-btn">Logout</button>
+      </div>
+
+      <section class="card">
+        <h2>Students</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Time</th>
+                <th>Total Attended</th>
+                <th>Attendance %</th>
+              </tr>
+            </thead>
+            <tbody id="students-body">
+              <tr>
+                <td colspan="6" class="center-muted">Login and select a subject to view attendance.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Main app script (Firebase v10 modular SDK) -->
+  <script type="module" src="rfid.js"></script>
+</body>
+</html>
