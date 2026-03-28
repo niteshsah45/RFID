@@ -1,36 +1,104 @@
 {
+  "activeSession": {
+    "date": "2026-03-28",
+    "sessionId": 1774702211900,
+    "status": "inactive",
+    "subject": "SUB001"
+  },
+  "attendance": {
+    "SUB002": {
+      "2026-03-28": {
+        "S001": {
+          "status": "present",
+          "time": "16:14"
+        }
+      },
+      "2026-03-28_1774701104040": {
+        "S001": {
+          "status": "present",
+          "time": "18:01"
+        }
+      }
+    },
+    "SUB003": {
+      "2026-03-28": {
+        "S001": {
+          "status": "present",
+          "time": "16:13"
+        }
+      },
+      "2026-03-28_1774701018339": {
+        "S001": {
+          "status": "present",
+          "time": "18:00"
+        }
+      },
+      "2026-03-28_1774702015418": {
+        "S001": {
+          "status": "present",
+          "time": "18:17"
+        }
+      }
+    },
+    "SUB004": {
+      "2026-03-28": {
+        "S001": {
+          "status": "present",
+          "time": "16:13"
+        }
+      },
+      "2026-03-28_1774701003507": {
+        "S001": {
+          "status": "present",
+          "time": "18:00"
+        }
+      },
+      "2026-03-28_1774701126289": {
+        "S001": {
+          "status": "present",
+          "time": "18:02"
+        }
+      },
+      "2026-03-28_1774702028639": {
+        "S001": {
+          "status": "present",
+          "time": "18:17"
+        }
+      }
+    }
+  },
   "students": {
-  "S001": {
-    "name": "Nitesh",
-    "rfidUid": "RFID001",
-    "department": "CSE",
-    "semester": 3
+    "S001": {
+      "department": "CSE",
+      "name": "Nitesh",
+      "rfidUid": "3DFCCFA",
+      "semester": 4
+    },
+    "S002": {
+      "department": "CSE",
+      "name": "Sam",
+      "rfidUid": "RFID002",
+      "semester": 4
+    },
+    "S003": {
+      "department": "CSE",
+      "name": "Prakriti",
+      "rfidUid": "RFID003",
+      "semester": 4
+    },
+    "S004": {
+      "department": "CSE",
+      "name": "Ashereya",
+      "rfidUid": "RFID004",
+      "semester": 4
+    },
+    "S005": {
+      "department": "CSE",
+      "name": "Arpit",
+      "rfidUid": "RFID005",
+      "semester": 4
+    }
   },
-  "S002": {
-    "name": "Sam",
-    "rfidUid": "RFID002",
-    "department": "CSE",
-    "semester": 3
-  },
-  "S003": {
-    "name": "Prakriti",
-    "rfidUid": "RFID003",
-    "department": "CSE",
-    "semester": 3
-  },
-  "S004": {
-    "name": "Ashereya",
-    "rfidUid": "RFID004",
-    "department": "CSE",
-    "semester": 3
-  },
-  "S005": {
-    "name": "Arpit",
-    "rfidUid": "RFID005",
-    "department": "CSE",
-    "semester": 3
-  }
-},
   "subjects": {
     "SUB001": {
       "department": "CSE",
@@ -82,3 +150,4 @@
     }
   }
 }
+// final

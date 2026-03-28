@@ -334,3 +334,4 @@ if (qrBox) {
     if (!err) qrBox.appendChild(canvas);
   });
 }
+//final
