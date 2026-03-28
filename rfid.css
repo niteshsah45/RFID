@@ -152,3 +152,12 @@ td {
     font-size: 1.25rem;
   }
 }
+.status-present {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.status-absent {
+  color: #dc2626;
+  font-weight: 600;
+}
