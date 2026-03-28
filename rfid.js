@@ -277,13 +277,15 @@ function renderTable() {
     const present = attendanceMap[id]?.status === "present";
     const count = totals[id] || 0;
     const percent = totalSessions > 0 ? ((count / totalSessions) * 100).toFixed(1) : 0;
+    const rowClass = present ? "row-present" : "";
 
     return `
-      <tr>
+      <tr class="${rowClass}">
+
         <td>${id}</td>
         <td>${s.name}</td>
         <td class="${present ? 'status-present' : 'status-absent'}">
-          ${present ? 'Present' : 'Absent'}
+          ${present ? '✔ Present' : '✖ Absent'}
         </td>
         <td>${attendanceMap[id]?.time || '-'}</td>
         <td>${count}/${totalSessions}</td>

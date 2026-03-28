@@ -153,11 +153,14 @@ td {
   }
 }
 .status-present {
-  color: #16a34a;
-  font-weight: 600;
+  color: green;
+  font-weight: bold;
 }
 
 .status-absent {
-  color: #dc2626;
-  font-weight: 600;
+  color: red;
+  font-weight: bold;
+}
+.row-present {
+  background: #dcfce7;
 }
