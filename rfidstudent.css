@@ -1,0 +1,14 @@
+#student-view-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#student-view-btn:hover {
+  background: #15803d;
+}

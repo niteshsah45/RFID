@@ -320,3 +320,17 @@ function renderTable() {
 
 // default date
 activeDateEl.textContent = new Date().toISOString().slice(0, 10);
+
+// 🔥 QR GENERATION (login page)
+const qrBox = document.getElementById("qr-box");
+
+if (qrBox) {
+
+  const studentId = "S001"; // test first
+
+  const url = `${window.location.origin}/rfidstudent.html?id=${studentId}`;
+
+  QRCode.toCanvas(url, function (err, canvas) {
+    if (!err) qrBox.appendChild(canvas);
+  });
+}

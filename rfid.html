@@ -17,6 +17,11 @@
     <section id="login-card" class="card">
       <h2>Teacher Login</h2>
       <form id="login-form" class="form-grid">
+        <hr>
+        <div style="text-align:center; margin-top:15px;">
+          <p><strong>Scan to Check Attendance</strong></p>
+          <div id="qr-box"></div>
+        </div>
         <label>
           Email
           <input type="email" id="email" placeholder="Enter your Email" required />
@@ -91,5 +96,6 @@
 
   <!-- Main app script (Firebase v10 modular SDK) -->
   <script type="module" src="rfid.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </body>
 </html>
