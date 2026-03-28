@@ -146,15 +146,16 @@ function attachDataListeners() {
     selectedSubject = subjectSelect.value;
 
     const today = new Date().toISOString().slice(0, 10);
+    const sessionId = Date.now();   // 🔥 IMPORTANT
 
     set(ref(db, 'activeSession'), {
       subject: selectedSubject,
-      status: 'active',
-      date: today
+      status: "active",
+      date: today,
+      sessionId: sessionId          // 🔥 MUST EXIST
     });
 
-    subscribeAttendanceForSelection();
-    loadTotalSessionsBySubject();
+    console.log("Session created:", sessionId);
   });
 }
 
