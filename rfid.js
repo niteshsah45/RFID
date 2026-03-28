@@ -73,13 +73,46 @@ onAuthStateChanged(auth, (user) => {
     loginCard.classList.add('hidden');
     dashboard.classList.remove('hidden');
     teacherEmail.textContent = user.email || 'Teacher';
-    attachDataListeners();
-  } else {
-    loginCard.classList.remove('hidden');
-    dashboard.classList.add('hidden');
-    cleanupDynamicListeners();
-  }
-});
+    // Load teacher record
+    onValue(ref(db, 'teachers'), (snapshot) => {
+      const teachers = snapshot.val() || {};
+
+      let currentTeacherId = null;
+
+      Object.entries(teachers).forEach(([id, teacher]) => {
+        if (teacher.email === user.email) {
+          currentTeacherId = id;
+        }
+      });
+
+      if (!currentTeacherId) {
+        subjects = [];
+        renderSubjects();
+        return;
+      }
+
+      const teacherSubjects = teachers[currentTeacherId].subjects || {};
+      const subjectIds = Object.keys(teacherSubjects);
+
+      // Now load only those subjects
+      onValue(ref(db, 'subjects'), (subSnap) => {
+        const allSubjects = subSnap.val() || {};
+
+        subjects = subjectIds
+          .filter(id => allSubjects[id])
+          .map(id => [id, allSubjects[id]]);
+
+        renderSubjects();
+      });
+    });
+
+        attachDataListeners();
+      } else {
+        loginCard.classList.remove('hidden');
+        dashboard.classList.add('hidden');
+        cleanupDynamicListeners();
+      }
+    });
 
 // --- Realtime Database listeners ---
 function attachDataListeners() {
@@ -90,14 +123,14 @@ function attachDataListeners() {
   });
 
   // Listen to subjects list for dropdown options
-  onValue(ref(db, 'subjects'), (snapshot) => {
-    const data = snapshot.val();
-    // Handle both array format and object list format
-      subjects = data
-    ? Object.entries(data)
-    : [];
-    renderSubjects();
-  });
+  // onValue(ref(db, 'subjects'), (snapshot) => {
+  //   const data = snapshot.val();
+  //   // Handle both array format and object list format
+  //     subjects = data
+  //   ? Object.entries(data)
+  //   : [];
+  //   renderSubjects();
+  // });
 
   // Listen to active session and auto-select subject/date
   onValue(ref(db, 'activeSessions'), (snapshot) => {

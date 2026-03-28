@@ -1,0 +1,84 @@
+{
+  "students": {
+  "S001": {
+    "name": "Nitesh",
+    "rfidUid": "RFID001",
+    "department": "CSE",
+    "semester": 3
+  },
+  "S002": {
+    "name": "Sam",
+    "rfidUid": "RFID002",
+    "department": "CSE",
+    "semester": 3
+  },
+  "S003": {
+    "name": "Prakriti",
+    "rfidUid": "RFID003",
+    "department": "CSE",
+    "semester": 3
+  },
+  "S004": {
+    "name": "Ashereya",
+    "rfidUid": "RFID004",
+    "department": "CSE",
+    "semester": 3
+  },
+  "S005": {
+    "name": "Arpit",
+    "rfidUid": "RFID005",
+    "department": "CSE",
+    "semester": 3
+  }
+},
+  "subjects": {
+    "SUB001": {
+      "department": "CSE",
+      "name": "Data Structures",
+      "semester": 4,
+      "teacherId": "T001"
+    },
+    "SUB002": {
+      "department": "CSE",
+      "name": "Machine Learning",
+      "semester": 4,
+      "teacherId": "T002"
+    },
+    "SUB003": {
+      "department": "CSE",
+      "name": "Computer System Architecture",
+      "semester": 4,
+      "teacherId": "T003"
+    },
+    "SUB004": {
+      "department": "CSE",
+      "name": "Integrated Project",
+      "semester": 4,
+      "teacherId": "T003"
+    }
+  },
+  "teachers": {
+    "T001": {
+      "email": "sangam@college.com",
+      "name": "Sangam Sharma",
+      "subjects": {
+        "SUB001": true
+      }
+    },
+    "T002": {
+      "email": "nagesh@college.com",
+      "name": "Dr Nagesh",
+      "subjects": {
+        "SUB002": true
+      }
+    },
+    "T003": {
+      "email": "navneetkaur@college.com",
+      "name": "Navneet Kaur",
+      "subjects": {
+        "SUB003": true,
+        "SUB004": true
+      }
+    }
+  }
+}
