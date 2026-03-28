@@ -164,3 +164,27 @@ td {
 .row-present {
   background: #dcfce7;
 }
+.stats {
+  display: flex;
+  gap: 12px;
+  margin: 10px;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.card p {
+  margin: 5px 0 0;
+  color: #555;
+}

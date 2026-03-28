@@ -85,13 +85,18 @@ loginForm.addEventListener('submit', async (e) => {
 });
 
 // Logout
-logoutBtn.addEventListener('click', async () => {
-  await update(ref(db, 'activeSession'), {
-    status: "inactive"
-  });
+  logoutBtn.addEventListener('click', async () => {
 
-  await signOut(auth);
-});
+    const confirmLogout = confirm("Are you sure you want to logout? Active session will be stopped.");
+
+    if (!confirmLogout) return;
+
+    await update(ref(db, 'activeSession'), {
+      status: "inactive"
+    });
+
+    await signOut(auth);
+  });
 
 // ---------------- AUTH STATE ----------------
 
@@ -263,7 +268,21 @@ function renderSubjects() {
 
 // ---------------- TABLE ----------------
 
+
+
 function renderTable() {
+
+  const totalStudents = Object.keys(studentsMap).length;
+
+  const presentToday = Object.values(attendanceMap).filter(
+  s => s.status === "present"
+  ).length;
+
+  const attendancePercent =
+  totalStudents > 0
+    ? ((presentToday / totalStudents) * 100).toFixed(1)
+    : 0;
+
   const students = Object.entries(studentsMap);
   const totalSessions = totalSessionsBySubject.totalSessions || 0;
   const totals = totalSessionsBySubject.totals || {};
@@ -293,6 +312,10 @@ function renderTable() {
       </tr>
     `;
   }).join('');
+
+  document.getElementById("total-students").textContent = totalStudents;
+  document.getElementById("present-today").textContent = presentToday;
+  document.getElementById("attendance-percent").textContent = attendancePercent + "%";
 }
 
 // default date
