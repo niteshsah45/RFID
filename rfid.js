@@ -13,7 +13,7 @@ import {
   onValue,
   off,
   set,
-  update   // ✅ IMPORTANT
+  update
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
 
 // Config
@@ -53,6 +53,23 @@ let selectedSubject = '';
 let totalSessionsBySubject = {};
 let detachAttendanceListener = null;
 
+// ---------------- 🔥 NEW FUNCTION ----------------
+function createNewSession(subjectId) {
+  const today = new Date().toISOString().slice(0, 10);
+  const sessionId = Date.now();
+
+  const data = {
+    subject: subjectId,
+    status: "active",
+    date: today,
+    sessionId: sessionId
+  };
+
+  console.log("SESSION CREATED:", data);
+
+  set(ref(db, 'activeSession'), data);
+}
+
 // ---------------- AUTH ----------------
 
 loginForm.addEventListener('submit', async (e) => {
@@ -67,7 +84,7 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ✅ FIXED LOGOUT (NO overwrite)
+// Logout
 logoutBtn.addEventListener('click', async () => {
   await update(ref(db, 'activeSession'), {
     status: "inactive"
@@ -129,13 +146,11 @@ function loadTeacherSubjects(email) {
 
 function attachDataListeners() {
 
-  // Students
   onValue(ref(db, 'students'), (snapshot) => {
     studentsMap = snapshot.val() || {};
     renderTable();
   });
 
-  // Active Session
   onValue(ref(db, 'activeSession'), (snapshot) => {
     activeSession = snapshot.val();
 
@@ -152,23 +167,10 @@ function attachDataListeners() {
     loadTotalSessionsBySubject();
   });
 
-  // ✅ SUBJECT CHANGE → NEW SESSION
+  // 🔥 UPDATED HANDLER
   subjectSelect.addEventListener('change', () => {
     selectedSubject = subjectSelect.value;
-
-    const today = new Date().toISOString().slice(0, 10);
-    const sessionId = Date.now();
-
-    const data = {
-      subject: selectedSubject,
-      status: "active",
-      date: today,
-      sessionId: sessionId
-    };
-
-    console.log("NEW SESSION:", data);
-
-    set(ref(db, 'activeSession'), data);
+    createNewSession(selectedSubject);
   });
 }
 
@@ -249,6 +251,14 @@ function renderSubjects() {
 
   if (!selectedSubject) selectedSubject = subjects[0][0];
   subjectSelect.value = selectedSubject;
+
+  // 🔥 AUTO SESSION FIX
+  if (
+    selectedSubject &&
+    (!activeSession?.sessionId || activeSession.status !== "active")
+  ) {
+    createNewSession(selectedSubject);
+  }
 }
 
 // ---------------- TABLE ----------------
@@ -264,7 +274,7 @@ function renderTable() {
   }
 
   studentsBody.innerHTML = students.map(([id, s]) => {
-    const present = attendanceMap[id];
+    const present = attendanceMap[id]?.status === "present";
     const count = totals[id] || 0;
     const percent = totalSessions > 0 ? ((count / totalSessions) * 100).toFixed(1) : 0;
 
@@ -275,7 +285,7 @@ function renderTable() {
         <td class="${present ? 'status-present' : 'status-absent'}">
           ${present ? 'Present' : 'Absent'}
         </td>
-        <td>${present?.time || '-'}</td>
+        <td>${attendanceMap[id]?.time || '-'}</td>
         <td>${count}/${totalSessions}</td>
         <td>${percent}%</td>
       </tr>
