@@ -1,4 +1,4 @@
-// Firebase v10+ modular SDK imports
+// Firebase imports
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import {
   getAuth,
@@ -6,20 +6,22 @@ import {
   onAuthStateChanged,
   signOut,
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
 import {
   getDatabase,
   ref,
   onValue,
   off,
-  set
+  set,
+  update   // ✅ IMPORTANT
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
 
-// Firebase config
+// Config
 const firebaseConfig = {
   apiKey: "AIzaSyAy55XJnvoF3W0qaT4AZ5iWxkj-4CLFWFk",
   authDomain: "rfid-attendance-system-aabc3.firebaseapp.com",
-  projectId: "rfid-attendance-system-aabc3",
   databaseURL: "https://rfid-attendance-system-aabc3-default-rtdb.firebaseio.com",
+  projectId: "rfid-attendance-system-aabc3",
   storageBucket: "rfid-attendance-system-aabc3.firebasestorage.app",
   messagingSenderId: "162396605109",
   appId: "1:162396605109:web:f6795c46f9f020daa70cfc"
@@ -42,16 +44,17 @@ const activeDateEl = document.getElementById('active-date');
 const logoutBtn = document.getElementById('logout-btn');
 const studentsBody = document.getElementById('students-body');
 
+// State
 let studentsMap = {};
 let attendanceMap = {};
 let subjects = [];
 let activeSession = null;
 let selectedSubject = '';
 let totalSessionsBySubject = {};
-
 let detachAttendanceListener = null;
 
-// --- AUTH ---
+// ---------------- AUTH ----------------
+
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginMessage.textContent = '';
@@ -64,10 +67,16 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
+// ✅ FIXED LOGOUT (NO overwrite)
 logoutBtn.addEventListener('click', async () => {
-  await set(ref(db, 'activeSession/status'), 'inactive');
+  await update(ref(db, 'activeSession'), {
+    status: "inactive"
+  });
+
   await signOut(auth);
 });
+
+// ---------------- AUTH STATE ----------------
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -75,38 +84,9 @@ onAuthStateChanged(auth, (user) => {
     dashboard.classList.remove('hidden');
     teacherEmail.textContent = user.email;
 
-    // Load teacher-specific subjects
-    onValue(ref(db, 'teachers'), (snapshot) => {
-      const teachers = snapshot.val() || {};
-      let currentTeacherId = null;
-
-      Object.entries(teachers).forEach(([id, teacher]) => {
-        if (teacher.email === user.email) {
-          currentTeacherId = id;
-        }
-      });
-
-      if (!currentTeacherId) {
-        subjects = [];
-        renderSubjects();
-        return;
-      }
-
-      const teacherSubjects = teachers[currentTeacherId].subjects || {};
-      const subjectIds = Object.keys(teacherSubjects);
-
-      onValue(ref(db, 'subjects'), (subSnap) => {
-        const allSubjects = subSnap.val() || {};
-
-        subjects = subjectIds
-          .filter(id => allSubjects[id])
-          .map(id => [id, allSubjects[id]]);
-
-        renderSubjects();
-      });
-    });
-
+    loadTeacherSubjects(user.email);
     attachDataListeners();
+
   } else {
     loginCard.classList.remove('hidden');
     dashboard.classList.add('hidden');
@@ -114,70 +94,105 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// --- DATA LISTENERS ---
+// ---------------- LOAD SUBJECTS ----------------
+
+function loadTeacherSubjects(email) {
+  onValue(ref(db, 'teachers'), (snapshot) => {
+    const teachers = snapshot.val() || {};
+    let teacherId = null;
+
+    Object.entries(teachers).forEach(([id, t]) => {
+      if (t.email === email) teacherId = id;
+    });
+
+    if (!teacherId) {
+      subjects = [];
+      renderSubjects();
+      return;
+    }
+
+    const subjectIds = Object.keys(teachers[teacherId].subjects || {});
+
+    onValue(ref(db, 'subjects'), (snap) => {
+      const allSubjects = snap.val() || {};
+
+      subjects = subjectIds
+        .filter(id => allSubjects[id])
+        .map(id => [id, allSubjects[id]]);
+
+      renderSubjects();
+    });
+  });
+}
+
+// ---------------- DATA LISTENERS ----------------
+
 function attachDataListeners() {
 
+  // Students
   onValue(ref(db, 'students'), (snapshot) => {
     studentsMap = snapshot.val() || {};
     renderTable();
   });
 
-  // 🔥 ACTIVE SESSION FIXED
+  // Active Session
   onValue(ref(db, 'activeSession'), (snapshot) => {
-    activeSession = snapshot.val() || null;
+    activeSession = snapshot.val();
 
     if (activeSession) {
-      activeDateEl.textContent = activeSession.date || new Date().toISOString().slice(0, 10);
+      activeDateEl.textContent = activeSession.date;
 
       if (activeSession.subject) {
         selectedSubject = activeSession.subject;
         subjectSelect.value = selectedSubject;
       }
-    } else {
-      activeDateEl.textContent = new Date().toISOString().slice(0, 10);
     }
 
     subscribeAttendanceForSelection();
     loadTotalSessionsBySubject();
   });
 
-  // 🔥 SUBJECT CHANGE → WRITE SESSION
+  // ✅ SUBJECT CHANGE → NEW SESSION
   subjectSelect.addEventListener('change', () => {
     selectedSubject = subjectSelect.value;
 
     const today = new Date().toISOString().slice(0, 10);
-    const sessionId = Date.now();   // 🔥 IMPORTANT
+    const sessionId = Date.now();
 
-    set(ref(db, 'activeSession'), {
+    const data = {
       subject: selectedSubject,
       status: "active",
       date: today,
-      sessionId: sessionId          // 🔥 MUST EXIST
-    });
+      sessionId: sessionId
+    };
 
-    console.log("Session created:", sessionId);
+    console.log("NEW SESSION:", data);
+
+    set(ref(db, 'activeSession'), data);
   });
 }
+
+// ---------------- CLEANUP ----------------
 
 function cleanupDynamicListeners() {
   if (detachAttendanceListener) detachAttendanceListener();
 }
 
-// --- ATTENDANCE LISTENER ---
+// ---------------- ATTENDANCE ----------------
+
 function subscribeAttendanceForSelection() {
 
   if (detachAttendanceListener) detachAttendanceListener();
 
-  const date = activeSession?.date || new Date().toISOString().slice(0, 10);
-  const subject = selectedSubject;
-
-  if (!subject) {
+  if (!selectedSubject || !activeSession?.sessionId) {
     attendanceMap = {};
     renderTable();
     return;
   }
 
-  const attendanceRef = ref(db, `attendance/${subject}/${date}`);
+  const sessionKey = `${activeSession.date}_${activeSession.sessionId}`;
+
+  const attendanceRef = ref(db, `attendance/${selectedSubject}/${sessionKey}`);
 
   const callback = (snapshot) => {
     attendanceMap = snapshot.val() || {};
@@ -188,31 +203,35 @@ function subscribeAttendanceForSelection() {
   detachAttendanceListener = () => off(attendanceRef, 'value', callback);
 }
 
-// --- TOTAL SESSIONS ---
-function loadTotalSessionsBySubject() {
-  const subject = selectedSubject;
-  if (!subject) return;
+// ---------------- TOTAL SESSIONS ----------------
 
-  onValue(ref(db, `attendance/${subject}`), (snapshot) => {
-    const subjectData = snapshot.val() || {};
-    const dates = Object.keys(subjectData);
-    const totalSessions = dates.length;
+function loadTotalSessionsBySubject() {
+  if (!selectedSubject) return;
+
+  onValue(ref(db, `attendance/${selectedSubject}`), (snapshot) => {
+    const data = snapshot.val() || {};
+    const sessions = Object.keys(data);
 
     const totals = {};
 
-    dates.forEach(date => {
-      const data = subjectData[date] || {};
-      Object.keys(data).forEach(id => {
+    sessions.forEach(session => {
+      const sData = data[session] || {};
+      Object.keys(sData).forEach(id => {
         totals[id] = (totals[id] || 0) + 1;
       });
     });
 
-    totalSessionsBySubject = { totals, totalSessions };
+    totalSessionsBySubject = {
+      totals,
+      totalSessions: sessions.length
+    };
+
     renderTable();
   });
 }
 
-// --- RENDER SUBJECTS ---
+// ---------------- SUBJECT UI ----------------
+
 function renderSubjects() {
   subjectSelect.innerHTML = '';
 
@@ -221,21 +240,19 @@ function renderSubjects() {
     return;
   }
 
-  subjects.forEach(([id, data]) => {
+  subjects.forEach(([id, s]) => {
     const option = document.createElement('option');
     option.value = id;
-    option.textContent = data.name;
+    option.textContent = s.name;
     subjectSelect.appendChild(option);
   });
 
-  if (!selectedSubject) {
-    selectedSubject = subjects[0][0]; // FIXED
-  }
-
+  if (!selectedSubject) selectedSubject = subjects[0][0];
   subjectSelect.value = selectedSubject;
 }
 
-// --- TABLE ---
+// ---------------- TABLE ----------------
+
 function renderTable() {
   const students = Object.entries(studentsMap);
   const totalSessions = totalSessionsBySubject.totalSessions || 0;
