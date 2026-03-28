@@ -328,7 +328,7 @@ if (qrBox) {
 
   const studentId = "S001"; // test first
 
-  const url = `${window.location.origin}/rfidstudent.html?id=${studentId}`;
+ const url = `https://endearing-valkyrie-5f5b07.netlify.app/rfidstudent.html?id=${studentId}`;
 
   QRCode.toCanvas(url, function (err, canvas) {
     if (!err) qrBox.appendChild(canvas);

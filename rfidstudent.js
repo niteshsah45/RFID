@@ -90,12 +90,22 @@ window.loadAttendance = async function () {
 };
 
 // 🔥 AUTO LOAD FROM QR
-window.addEventListener("load", () => {
-  const id = getStudentIdFromURL();
+window.addEventListener("DOMContentLoaded", () => {
 
+  console.log("JS Loaded on device");
+
+  // attach button click
+  const btn = document.getElementById("check-btn");
+  if (btn) {
+    btn.addEventListener("click", loadAttendance);
+  }
+
+  // auto-load from QR
+  const id = getStudentIdFromURL();
   if (id) {
     document.getElementById("student-id").value = id;
     loadAttendance();
   }
+
 });
 //final
