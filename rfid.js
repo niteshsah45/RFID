@@ -84,6 +84,19 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
+// password show
+// const passwordInput = document.getElementById("password");
+const toggleBtn = document.getElementById("toggle-password");
+
+if (toggleBtn) {
+  toggleBtn.addEventListener("click", () => {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+
+    toggleBtn.textContent = type === "password" ? "👁" : "Hide";
+  });
+}
+
 // Logout
   logoutBtn.addEventListener('click', async () => {
 

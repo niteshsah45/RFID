@@ -188,4 +188,24 @@ td {
   margin: 5px 0 0;
   color: #555;
 }
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 10px;
+  padding-right: 40px; /* space for icon */
+  box-sizing: border-box;
+}
+
+#toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+}
 /* final */
