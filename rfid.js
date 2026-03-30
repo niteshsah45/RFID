@@ -50,6 +50,37 @@ const activeDateEl = document.getElementById('active-date');
 const logoutBtn = document.getElementById('logout-btn');
 const studentsBody = document.getElementById('students-body');
 
+
+// For chainging subjects and  logout
+function showConfirm(message) {
+  return new Promise((resolve) => {
+
+    const modal = document.getElementById("confirm-modal");
+    const text = document.getElementById("modal-text");
+    const confirmBtn = document.getElementById("confirm-btn");
+    const cancelBtn = document.getElementById("cancel-btn");
+
+    text.textContent = message;
+    modal.classList.remove("hidden");
+
+    const cleanup = () => {
+      modal.classList.add("hidden");
+      confirmBtn.onclick = null;
+      cancelBtn.onclick = null;
+    };
+
+    confirmBtn.onclick = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    cancelBtn.onclick = () => {
+      cleanup();
+      resolve(false);
+    };
+  });
+}
+
 // State
 let studentsMap = {};
 let attendanceMap = {};
@@ -99,23 +130,25 @@ if (toggleBtn) {
     const type = passwordInput.type === "password" ? "text" : "password";
     passwordInput.type = type;
 
-    toggleBtn.textContent = type === "password" ? "👁" : "Hide";
+    toggleBtn.textContent = type === "password" ? "👁" : "👁‍🗙";
   });
 }
 
 // Logout
-  logoutBtn.addEventListener('click', async () => {
+logoutBtn.addEventListener('click', async () => {
 
-    const confirmLogout = confirm("Are you sure you want to logout? Active session will be stopped.");
+  const confirmLogout = await showConfirm(
+    "Logout and end current session?"
+  );
 
-    if (!confirmLogout) return;
+  if (!confirmLogout) return;
 
-    await update(ref(db, 'activeSession'), {
-      status: "inactive"
-    });
-
-    await signOut(auth);
+  await update(ref(db, 'activeSession'), {
+    status: "inactive"
   });
+
+  await signOut(auth);
+});
 
 // ---------------- AUTH STATE ----------------
 
@@ -191,10 +224,32 @@ function attachDataListeners() {
     loadTotalSessionsBySubject();
   });
 
-  // 🔥 UPDATED HANDLER
-  subjectSelect.addEventListener('change', () => {
-    selectedSubject = subjectSelect.value;
+  // Session selection and conformation for subject switching
+  subjectSelect.addEventListener('change', async () => {
+
+  const newSubject = subjectSelect.value;
+
+  if (activeSession && activeSession.status === "active") {
+
+    const confirmSwitch = await showConfirm(
+      "End current session and start a new one?"
+    );
+
+    if (!confirmSwitch) {
+      subjectSelect.value = selectedSubject;
+      return;
+    }
+
+    //saveSessionHistory();
+
+    await update(ref(db, 'activeSession'), {
+      status: "inactive"
+    });
+  }
+
+    selectedSubject = newSubject;
     createNewSession(selectedSubject);
+
   });
 }
 

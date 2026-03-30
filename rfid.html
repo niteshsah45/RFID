@@ -100,6 +100,19 @@
   <!-- Main app script (Firebase v10 modular SDK) -->
   <script type="module" src="rfid.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+
+  <!-- For confirming before changing subject or logout things -->
+<div id="confirm-modal" class="modal hidden">
+  <div class="modal-box">
+    <p id="modal-text"></p>
+
+    <div class="modal-actions">
+      <button id="cancel-btn">Cancel</button>
+      <button id="confirm-btn">Confirm</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 <!-- final -->
