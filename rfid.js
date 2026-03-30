@@ -7,6 +7,11 @@ import {
   signOut,
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 
+// for auto logout if tab is closed 
+
+import { setPersistence, browserSessionPersistence } 
+from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
 import {
   getDatabase,
   ref,
@@ -29,6 +34,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+setPersistence(auth, browserSessionPersistence);
 const db = getDatabase(app);
 
 // DOM
